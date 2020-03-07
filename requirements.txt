@@ -3,3 +3,4 @@ random
 json
 os
 colorama
+easygui
