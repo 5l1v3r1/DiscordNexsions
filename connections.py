@@ -1,56 +1,77 @@
-import requests, random, json, os, easygui
+import requests, random, json, os, easygui, time
 from colorama import init, Fore
 init(convert=True)
 
-pause = lambda : os.system('pause')
 clear = lambda : os.system("cls")
 
-def info():
 
-    info = {}
+class Connection:
+    def __init__(self):
+        self = self
 
-    print(f"{Fore.CYAN} Please input your discord tokens {Fore.RESET}")
-    info["token"] = str(input(" > "))
-    print(f"{Fore.CYAN} Please input your desired method: [battlenet, skype, lol, contacts] {Fore.RESET}")
-    info["option"] = str(input(" > "))
-    print(f"{Fore.CYAN} Input the amount of connections you'd like {Fore.RESET}")
-    info["amount"] = int(input(" > "))
-    print(f"{Fore.CYAN} Input the desired name {Fore.RESET}")
-    info["name"] = str(input(" > "))
-    return json.loads(str(info).replace("'", '"'))
+    def info(self):
 
-def start():
+        info = {}
 
-    information = info()
+        print(f"{Fore.CYAN} Please select your tokens file {Fore.RESET}")
+        time.sleep(1)
+        info["tokens"] = "".join(open(easygui.fileopenbox()).readlines()).split("\n")
+        clear()
+        print(f"{Fore.CYAN} Please input your desired method: [battlenet, skype, lol, contacts] {Fore.RESET}")
+        info["option"] = str(input(" > "))
+        print(f"{Fore.CYAN} Input the amount of connections {Fore.RESET}")
+        info["amount"] = int(input(" > "))
+        print(f"{Fore.CYAN} Input the desired name {Fore.RESET}")
+        info["name"] = str(input(" > "))
+        return json.loads(str(info).replace("'", '"'))
 
-    with requests.Session() as session:
-                i = 0
-                while True:
-                    i+=1
-                    if i < information["amount"]:
-                        req = session.put(f'https://discordapp.com/api/v6/users/@me/connections/{information["option"]}/{random.randint(1, 10)}', 
+    def start(self):
 
-                        json={
-                            "name": information["name"],
-                            "visibility": 1,
-                            "verified": True
-                            },
-                        headers={
-                            "Content-Type": "application/json",
-                            "Content-Length": str(len(information["name"])),
-                            "Authorization": str(information["token"])
-                            })
+        information = self.info()
 
-                        try:
-                            if json.loads(req.text)["type"] == information["option"]:
-                                print(f"{Fore.GREEN} Successfully added the new connection {Fore.RESET}")
-                        except:
-                            print(f"{Fore.RED} An error occured. On token: {information['token']} {Fore.RESET}")   
-                    else:
-                        print(Fore.RED + "\n ")
-                        pause()
-                        exit()                                  
+        with requests.Session() as session:
+
+                    for token in information["tokens"]:
+                        for _i in range(information["amount"]):
+                            req = session.put(f'https://discordapp.com/api/v6/users/@me/connections/{information["option"]}/{random.randint(1, 10)}', 
+
+                            json={
+                                        "name": information["name"],
+                                        "visibility": 1,
+                                        "verified": True
+                                },
+                            headers={
+                                        "Content-Type": "application/json",
+                                        "Content-Length": str(len(information["name"])),
+                                        "Authorization": token
+                                    })
+
+                                
+                            try:
+                                if json.loads(req.text)["type"]:
+                                        print(f"{Fore.GREEN} Successfully added the new connection {Fore.RESET}")
+                            except:
+                                pass
+                    self.quest()
+
+    def quest(self):
+            print(f'''
+ {Fore.CYAN}[{Fore.RESET}1{Fore.CYAN}]: {Fore.RESET} Add new connection 
+ {Fore.CYAN}[{Fore.RESET}2{Fore.CYAN}]: {Fore.RESET} Exit Program 
+        ''')
+
+            choice = int(input(" > "))
+
+            if choice == 1:
+                clear()
+                self.start()
+                return
+
+            if choice == 2:
+                clear()
+                exit()
+                return
 
 
 if __name__ == "__main__":
-    start()
+    Connection().start()
