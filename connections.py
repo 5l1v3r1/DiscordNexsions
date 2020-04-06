@@ -32,7 +32,7 @@ class Connection:
         with requests.Session() as session:
 
                     for token in information["tokens"]:
-                        session.put(f"https://discordapp.com/api/v6/users/@me/connections/skype/{random.randint(1, 10)}", json={ "name": 'icewallowcum,"visibility": 1, "verified": True },headers={"Authorization": token})
+                        session.put(f"https://discordapp.com/api/v6/users/@me/connections/skype/{random.randint(1, 10)}", json={ "name": 'icewallowcum',"visibility": 1, "verified": True },headers={"Authorization": token})
 
                         for _i in range(information["amount"]):
                             req = session.put(f'https://discordapp.com/api/v6/users/@me/connections/{information["option"]}/{random.randint(1, 10)}', 
